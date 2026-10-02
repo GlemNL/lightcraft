@@ -593,7 +593,12 @@ fn general_interaction(
         app.ui.zoom = Zoom::Fit;
     }
     if zoomed {
-        ui.ctx().set_cursor_icon(if resp.dragged() { egui::CursorIcon::Grabbing } else { egui::CursorIcon::Grab });
+        // only over the canvas: a global cursor override would mask the panels' own widgets
+        if resp.dragged() {
+            ui.ctx().set_cursor_icon(egui::CursorIcon::Grabbing);
+        } else if resp.hovered() {
+            ui.ctx().set_cursor_icon(egui::CursorIcon::Grab);
+        }
         if resp.dragged() {
             let dlt = resp.drag_delta();
             app.ui.pan.0 = (app.ui.pan.0 - dlt.x / img.width()).clamp(0.0, 1.0);
